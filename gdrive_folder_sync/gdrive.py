@@ -2,7 +2,7 @@
 
 import json
 import os
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from apiclient.discovery import build
 import click
@@ -45,7 +45,8 @@ class GDrive(object):
         self.root_id = self.service.files().get(fileId="root").execute()["id"]
 
     def get_folders_and_files(
-        self, parent_id: str
+        self, parent_id: str,
+        name_filter: Optional[str] = None
     ) -> Tuple[List[Dict[str, str]], List[Dict[str, str]]]:
         all_items = []  # type: List[Dict[str, str]]
         next_page_token = None
@@ -53,12 +54,15 @@ class GDrive(object):
         def f():
             nonlocal all_items
             nonlocal next_page_token
+            query = f"'{parent_id}' in parents"
+            if name_filter is not None:
+                query = f"{query} and name contains '{name_filter}'"
             results = (
                 self.service.files()
                 .list(
                     pageSize=100,
                     orderBy="folder",
-                    q="'{}' in parents".format(parent_id),
+                    q=query,
                     pageToken=next_page_token,
                 )
                 .execute()

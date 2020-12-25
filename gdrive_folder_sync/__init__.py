@@ -25,6 +25,7 @@ def sync(src_folder_id: str, dest_folder_id: str, no_recursive: bool):
 def copy(file_id: str, dest_folder_id: str):
     gdrive = GDrive()
     gdrive.copy_file_to_parent(file_id, dest_folder_id)
+    click.echo(f"file='{file_id}' copied to folder='{dest_folder_id}'")
 
 
 @cli.command(name="list", help="Listing files in the folder")
